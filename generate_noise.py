@@ -52,7 +52,7 @@ def add_convolve_noise(image, sigma=1.0, mean=0, sigma_noise=18):
 
 # TODO: they are the same 
 # Keep-Patch: where pixels outside of a randomly chosen k × k patch are set to zero
-def add_keep_patch_noise(image, height_patch_size=32,width_patch_size=32):
+def add_keep_patch_noise(image, height_patch_size=510,width_patch_size=510):
     """
     Add Keep-Patch noise to an image.
     
@@ -78,7 +78,7 @@ def add_keep_patch_noise(image, height_patch_size=32,width_patch_size=32):
     
     return noisy_image,image
 #Extract-Patch: where pixels within a randomly chosen k × k are extracted.
-def add_extract_patch_noise(image, height_patch_size=32,width_patch_size=32):
+def add_extract_patch_noise(image, height_patch_size=510,width_patch_size=510):
     """
     Add Extract-Patch noise to an image.
     
@@ -108,7 +108,7 @@ def add_extract_patch_noise(image, height_patch_size=32,width_patch_size=32):
     return noisy_image,image
 
 # Pad-Rotate-Project: where the padded image is rotated at a random angle about the center
-def add_pad_rotate_project_noise(image, max_rotation=30):
+def add_pad_rotate_project_noise(image, max_rotation=2):
     """
     Add Pad-Rotate-Project noise to an image.
     
@@ -197,7 +197,7 @@ def add_line_strip_noise(image, strip_width=5, intensity=0.5):
     
     return copy_image,image
 
-def add_salt_and_pepper_noise(image, salt_prob, pepper_prob):
+def add_salt_and_pepper_noise(image,salt_prob=0.05, pepper_prob=0.05):
     """
     Add salt and pepper noise to the image.
     
