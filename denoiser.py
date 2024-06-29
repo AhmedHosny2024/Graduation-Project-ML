@@ -163,46 +163,49 @@ def denoise_image(image, method):
     elif method == 'gaussian':
         # sadly it make the image plurry
         return remove_gaussian_projection_noise(image)
+    elif method == 'no-noise':
+        return image
     else:
         raise ValueError("Invalid method: {}".format(method) + "Choose from 'block-pixel', 'convolve', 'keep-patch', 'extract-patch', 'pad-rotate-project', 'line-strip', 'salt-and-pepper', 'gaussian'")
     
 
-# save all noise functions in dictionary
-noise_functions = {
-    'block-pixel': add_block_pixel_noise,
-    'convolve': add_convolve_noise,
-    'keep-patch': add_keep_patch_noise,
-    'extract-patch': add_extract_patch_noise,
-    'pad-rotate-project': add_pad_rotate_project_noise,
-    'line-strip': add_line_strip_noise,
-    'salt-and-pepper': add_salt_and_pepper_noise,
-    'gaussian': add_gaussian_projection_noise
-}
+if __name__ == "__main__":
+  # save all noise functions in dictionary
+  noise_functions = {
+      'block-pixel': add_block_pixel_noise,
+      'convolve': add_convolve_noise,
+      'keep-patch': add_keep_patch_noise,
+      'extract-patch': add_extract_patch_noise,
+      'pad-rotate-project': add_pad_rotate_project_noise,
+      'line-strip': add_line_strip_noise,
+      'salt-and-pepper': add_salt_and_pepper_noise,
+      'gaussian': add_gaussian_projection_noise
+  }
 
-for (key,func) in noise_functions.items():
-    image = cv2.imread('image.jpg', cv2.IMREAD_UNCHANGED)
-    image=np.array(image).astype("float32")
-    image = cv2.resize(image, (512, 512))
-    noise_image,image = func(image)
-    clean_image = denoise_image(noise_image, method=key)
+  for (key,func) in noise_functions.items():
+      image = cv2.imread('image.jpg', cv2.IMREAD_UNCHANGED)
+      image=np.array(image).astype("float32")
+      image = cv2.resize(image, (512, 512))
+      noise_image,image = func(image)
+      clean_image = denoise_image(noise_image, method=key)
 
-    ssim,psnr = eval_metrics(image, clean_image)
+      ssim,psnr = eval_metrics(image, clean_image)
 
-    print("Method: ", key, " SSIM: ", ssim, " PSNR: ", psnr)
+      print("Method: ", key, " SSIM: ", ssim, " PSNR: ", psnr)
 
-    plt.figure(figsize=(10, 5))
-    plt.subplot(1, 3, 1)
-    plt.imshow(image, cmap="gray")
-    plt.title("Original Image")
-    plt.axis("off")
-    plt.subplot(1, 3, 2)
-    plt.imshow(noise_image, cmap="gray")
-    plt.title("Noisy Image")
-    plt.axis("off")
-    plt.subplot(1, 3, 3)
-    plt.imshow(clean_image, cmap="gray")
-    plt.title("Clean Image")
-    plt.axis("off")
-    plt.show()
-    plt.show()
-    
+      plt.figure(figsize=(10, 5))
+      plt.subplot(1, 3, 1)
+      plt.imshow(image, cmap="gray")
+      plt.title("Original Image")
+      plt.axis("off")
+      plt.subplot(1, 3, 2)
+      plt.imshow(noise_image, cmap="gray")
+      plt.title("Noisy Image")
+      plt.axis("off")
+      plt.subplot(1, 3, 3)
+      plt.imshow(clean_image, cmap="gray")
+      plt.title("Clean Image")
+      plt.axis("off")
+      plt.show()
+      plt.show()
+      
