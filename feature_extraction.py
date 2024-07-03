@@ -1,32 +1,51 @@
 from skimage.feature import hog
 import numpy as np
 
-
-# 1- got 0.1875 accuracy 
-# Average SSIM:  0.7722181199388367
-# Average PSNR:  28.970157366174934
+# SVM
+#   Accuracy:  0.3333333333333333 
+#   Average SSIM:  0.9706744820566566
+#   Average PSNR:  36.36342098511046
+# RANDOM FOREST
+#   Accuracy:  0.4375
+#   Average SSIM:  0.8302919768181796
+#   Average PSNR:  30.89012875967285
 def all_image(image):
   return image.flatten() 
 
-# 2- got 0.4375 accuracy
-# Average SSIM:  0.7970383516956439
-# Average PSNR:  29.497383485113495
+# SVM
+#   Accuracy:  0.3333333333333333
+#   Average SSIM:  0.9706967410660425
+#   Average PSNR:  36.412467623255
+# RANDOM FOREST
+#   Accuracy:  1.0   WOW 😎
+#   Average SSIM:  0.9327131385372782
+#   Average PSNR:  34.47807884234579
 def Hog(image):
   fd, hog_image = hog(image, orientations=8, pixels_per_cell=(16, 16),
                     cells_per_block=(1, 1), visualize=True,feature_vector=True)
   return fd
 
-# 3- got 0.25 accuracy
-# Average SSIM: 0.9703221610497511 
-# Average PSNR: 35.96126321499047
+# SVM
+#   3Accuracy:  0.3333333333333333
+#   Average SSIM:  0.6988707117158928
+#   Average PSNR:  26.017515034225344
+# RANDOM FOREST
+#   Accuracy:  0.9583333333333334
+#   Average SSIM:  0.9328699278993343
+#   Average PSNR:  34.580314125480264
 def Hog2(image):
   fd, hog_image = hog(image, orientations=8, pixels_per_cell=(8, 8),
                     cells_per_block=(1, 1), visualize=True,feature_vector=True)
   return fd
 
-# 4- got 0.3125 accuracy
-# Average SSIM:  0.7040074849462885
-# Average PSNR:  26.0354890824695
+# SVM
+#   Accuracy:  0.3333333333333333
+#   Average SSIM:  0.9706847828242776
+#   Average PSNR:  36.383200709957656
+# RANDOM FOREST
+#   Accuracy:  1.0   WOW 😎
+#   Average SSIM:  0.9327725672987425
+#   Average PSNR:  34.489576292298
 def fourier_transform(image):
   f = np.fft.fft2(image)
   fshift = np.fft.fftshift(f)
@@ -39,5 +58,5 @@ the denoised image will be wrong (as the denoising function will be wrong as wel
 we got high SSIM and PSNR because the change in the image is small line line strip or block pixel noise
 BUT it remove the medical information in the image or didn't remove the noise which is the main goal of the project
 so we didn't use it
-it get this result which train on 4 types of noise 150 image and test on 16 image
+it get this result which train on 4 types of noise 450 image and test on 48 image
 '''

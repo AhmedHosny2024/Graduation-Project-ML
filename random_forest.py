@@ -6,22 +6,17 @@ import sys
 import albumentations as A
 from generate_noise import *
 from feature_extraction import *
-from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+
 
 transform =  A.Compose(
                 [
                     A.LongestMaxSize(max_size=512, interpolation=cv2.INTER_AREA),
-                    # A.PadIfNeeded(min_height=IMAGE_INPUT_SIZE, min_width=IMAGE_INPUT_SIZE, border_mode=cv2.BORDER_CONSTANT),
-                    # A.Normalize(mean=MEAN, std=STD),
-                    # ToTensorV2(),
                 ]
             )
 transform2 =  A.Compose(
                 [
-                    # A.LongestMaxSize(max_size=IMAGE_INPUT_SIZE, interpolation=cv2.INTER_AREA),
                     A.PadIfNeeded(min_height=512, min_width=512,border_mode= cv2.BORDER_CONSTANT,value=0),
-                    # A.Normalize(mean=MEAN, std=STD),
-                    # ToTensorV2(),
                 ]
             )
 
@@ -65,14 +60,19 @@ for img_path in tain_img_paths:
       Xtrain.append(fourier_transform(noisy_img))
       ytrain.append(label)
 
-# 3 train the model
-model = SVC(kernel='rbf', C=1, gamma=0.1)
+# 3 train the model RandomForest
+
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+
 print("Training the model...")
 print("Xtrain shape: ", np.array(Xtrain).shape)
 print("ytrain shape: ", np.array(ytrain).shape)
 
 model.fit(Xtrain, ytrain)
 
+joblib.dump(model, 'random_forest.pth')
+
+# 4 test the model
 # 4 test the model
 test_img_paths = test["mimic_image_file_path"].tolist()
 Xtest=[]
@@ -82,9 +82,9 @@ for img_path in test_img_paths:
     img_path = img_path.replace("\\", "/")
     img = cv2.imread(img_path,cv2.IMREAD_UNCHANGED)
     img = transform(image=img)["image"]
-    choice = np.random.choice([1,2,3])   
+    choice = np.random.choice([1,2,3])  
     for i in range(1,4,1):
-      choice=i     
+      choice = i      
       if choice == 1:
           noisy_img,_ = add_block_pixel_noise(img)
           label ="block-pixel"

@@ -19,12 +19,13 @@ transform2 =  A.Compose(
             )
 
 base_path ='C:/Users/engah/Downloads/GP/Graduation-Project/'
-image_dire='Hog2/'
+image_dire='fourier_transform_svm/'
 
 test = pd.read_csv('C:/Users/engah/Downloads/GP/Graduation-Project/datasets/test.csv')
 
 # load svm model
 model = joblib.load('model.pth')
+
 # 4 test the model
 test_img_paths = test["mimic_image_file_path"].tolist()
 ytest=[]
@@ -38,27 +39,29 @@ for img_path in test_img_paths:
     img = cv2.imread(img_path,cv2.IMREAD_UNCHANGED)
     img = transform(image=img)["image"]
     choice = np.random.choice([1,2,3])
-    if choice == 1:
-        noisy_img,label = add_block_pixel_noise(img)
-        yactual.append("block-pixel")
-    elif choice == 2:
-        noisy_img,label = add_salt_and_pepper_noise(img)
-        yactual.append("salt-and-pepper")
-    elif choice == 3:
-        noisy_img,label = add_gaussian_projection_noise(img)
-        yactual.append("gaussian")
-    else:
-        noisy_img,label=img.copy(),img.copy()
-        yactual.append("no-noise")
-        
-    noisy_img = transform2(image=noisy_img)["image"]
-    label = transform2(image=label)["image"]
-    # Xtest.append(all_image(noisy_img))
-    # Xtest.append(Hog(noisy_img))
-    Xtest.append(Hog2(noisy_img))
-    # Xtest.append(fourier_transform(noisy_img))
-    Xtest_images.append(noisy_img)
-    ytest.append(label)
+    for i in range(1,4,1):
+      choice=i
+      if choice == 1:
+          noisy_img,label = add_block_pixel_noise(img)
+          yactual.append("block-pixel")
+      elif choice == 2:
+          noisy_img,label = add_salt_and_pepper_noise(img)
+          yactual.append("salt-and-pepper")
+      elif choice == 3:
+          noisy_img,label = add_gaussian_projection_noise(img)
+          yactual.append("gaussian")
+      else:
+          noisy_img,label=img.copy(),img.copy()
+          yactual.append("no-noise")
+          
+      noisy_img = transform2(image=noisy_img)["image"]
+      label = transform2(image=label)["image"]
+      # Xtest.append(all_image(noisy_img))
+      # Xtest.append(Hog(noisy_img))
+      # Xtest.append(Hog2(noisy_img))
+      Xtest.append(fourier_transform(noisy_img))
+      Xtest_images.append(noisy_img)
+      ytest.append(label)
 
 print("Testing the model...")
 print("Xtest shape: ", np.array(Xtest).shape)

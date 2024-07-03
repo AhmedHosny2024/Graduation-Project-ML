@@ -1,7 +1,11 @@
-all_image
-Hog
-Hog2
-fourier_transform
+all_image_svm
+all_image_random_forest
+Hog_random_forest
+Hog_svm
+Hog2_random_forest
+Hog2_svm
+fourier_transform_random_forest
+fourier_transform_svm
 *.pth
 
 # Byte-compiled / optimized / DLL files
