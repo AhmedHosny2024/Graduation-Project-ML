@@ -70,8 +70,6 @@ print("ytrain shape: ", np.array(ytrain).shape)
 
 model.fit(Xtrain, ytrain)
 
-joblib.dump(model, 'random_forest.pth')
-
 # 4 test the model
 # 4 test the model
 test_img_paths = test["mimic_image_file_path"].tolist()
