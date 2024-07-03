@@ -6,6 +6,8 @@ Hog2_random_forest
 Hog2_svm
 fourier_transform_random_forest
 fourier_transform_svm
+mix_feature_random_forest
+mix_feature_svm
 *.pth
 
 # Byte-compiled / optimized / DLL files

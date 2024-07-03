@@ -62,7 +62,8 @@ for img_path in tain_img_paths:
       # Xtrain.append(all_image(noisy_img))
       # Xtrain.append(Hog(noisy_img))
       # Xtrain.append(Hog2(noisy_img))
-      Xtrain.append(fourier_transform(noisy_img))
+      # Xtrain.append(fourier_transform(noisy_img))
+      Xtrain.append(mix_features(noisy_img))
       ytrain.append(label)
 
 # 3 train the model
@@ -101,7 +102,8 @@ for img_path in test_img_paths:
       # Xtest.append(all_image(noisy_img))
       # Xtest.append(Hog(noisy_img))
       # Xtest.append(Hog2(noisy_img))
-      Xtest.append(fourier_transform(noisy_img))
+      # Xtest.append(fourier_transform(noisy_img))
+      Xtest.append(mix_features(noisy_img))
       ytest.append(label)
 
 print("Testing the model...")

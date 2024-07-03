@@ -19,7 +19,7 @@ transform2 =  A.Compose(
             )
 
 base_path ='C:/Users/engah/Downloads/GP/Graduation-Project/'
-image_dire='fourier_transform_svm/'
+image_dire='mix_feature_svm/'
 
 test = pd.read_csv('C:/Users/engah/Downloads/GP/Graduation-Project/datasets/test.csv')
 
@@ -59,7 +59,8 @@ for img_path in test_img_paths:
       # Xtest.append(all_image(noisy_img))
       # Xtest.append(Hog(noisy_img))
       # Xtest.append(Hog2(noisy_img))
-      Xtest.append(fourier_transform(noisy_img))
+      # Xtest.append(fourier_transform(noisy_img))
+      Xtest.append(mix_features(noisy_img))
       Xtest_images.append(noisy_img)
       ytest.append(label)
 

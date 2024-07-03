@@ -52,6 +52,17 @@ def fourier_transform(image):
   magnitude_spectrum = 20*np.log(np.abs(fshift))
   return magnitude_spectrum.flatten()
 
+# SVM
+#   Accuracy:  0.3333333333333333
+#   Average SSIM:  0.9706054619935945
+#   Average PSNR:  36.34067142764114
+# RANDOM FOREST 
+#   Accuracy:  1.0
+#   Average SSIM:  0.9327485700951085
+#   Average PSNR:  34.4827113404983
+def mix_features(image):
+  return np.concatenate((Hog(image),fourier_transform(image)),axis=0)
+
 '''
 when the model classifiy the image noise type wrong (which is happen many times as the classifier acuracy is low) 
 the denoised image will be wrong (as the denoising function will be wrong as well) 
