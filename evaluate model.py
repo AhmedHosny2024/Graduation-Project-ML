@@ -56,6 +56,7 @@ for img_path in test_img_paths:
     # Xtest.append(all_image(noisy_img))
     # Xtest.append(Hog(noisy_img))
     Xtest.append(Hog2(noisy_img))
+    # Xtest.append(fourier_transform(noisy_img))
     Xtest_images.append(noisy_img)
     ytest.append(label)
 

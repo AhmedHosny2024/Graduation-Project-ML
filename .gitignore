@@ -1,6 +1,7 @@
 all_image
 Hog
 Hog2
+fourier_transform
 *.pth
 
 # Byte-compiled / optimized / DLL files

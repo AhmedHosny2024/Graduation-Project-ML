@@ -1,4 +1,5 @@
 from skimage.feature import hog
+import numpy as np
 
 
 # 1- got 0.1875 accuracy 
@@ -15,13 +16,22 @@ def Hog(image):
                     cells_per_block=(1, 1), visualize=True,feature_vector=True)
   return fd
 
-# 3- got 0.3125 accuracy
-# Average SSIM:  0.9705704613517099
-# Average PSNR:  36.07985514301815
+# 3- got 0.25 accuracy
+# Average SSIM: 0.9703221610497511 
+# Average PSNR: 35.96126321499047
 def Hog2(image):
   fd, hog_image = hog(image, orientations=8, pixels_per_cell=(8, 8),
                     cells_per_block=(1, 1), visualize=True,feature_vector=True)
   return fd
+
+# 4- got 0.3125 accuracy
+# Average SSIM:  0.7040074849462885
+# Average PSNR:  26.0354890824695
+def fourier_transform(image):
+  f = np.fft.fft2(image)
+  fshift = np.fft.fftshift(f)
+  magnitude_spectrum = 20*np.log(np.abs(fshift))
+  return magnitude_spectrum.flatten()
 
 '''
 when the model classifiy the image noise type wrong (which is happen many times as the classifier acuracy is low) 
