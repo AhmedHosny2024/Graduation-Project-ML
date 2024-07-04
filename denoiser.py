@@ -1,6 +1,6 @@
 import cv2
 from generate_noise import *
-
+from utils import *
 def remove_block_pixel_noise(image):
     """
     Remove Block-Pixel noise using median filtering.
@@ -11,7 +11,7 @@ def remove_block_pixel_noise(image):
     Returns:
         Denoised image (numpy array).
     """
-    denoised_image = cv2.medianBlur(image, 3)
+    denoised_image = median_blur(image, ksize=3)
     return denoised_image
 
 def remove_convolve_noise(image, sigma=1.0):
@@ -26,13 +26,20 @@ def remove_convolve_noise(image, sigma=1.0):
         Denoised image (numpy array).
     """
     # Step 1: Gaussian filtering to reduce blur
-    kernel_size = int(2 * sigma) + 1
-    gaussian_filtered_image = cv2.GaussianBlur(image, (kernel_size, kernel_size), sigma)
-    
+    kernel_size = int(2 * sigma + 1)
+    gaussian_kernel_ = gaussian_kernel(kernel_size, sigma)
+    gaussian_filtered_image = apply_convolution(image, gaussian_kernel_)
+
     # Step 2: Non-Local Means Denoising to remove Gaussian noise
-    denoised_image = cv2.fastNlMeansDenoising(gaussian_filtered_image, None, 30, 7, 21)
+    # denoised_image = cv2.fastNlMeansDenoising(gaussian_filtered_image, None, 30, 7, 21)
     
+    # this is the implementation of the above line from scratch
+    denoised_image = non_local_means_denoising(gaussian_filtered_image, h=30, patch_size=7, window_size=21)
+
     return denoised_image
+
+
+
 
 def remove_keep_patch_noise(image):
     """
@@ -45,7 +52,7 @@ def remove_keep_patch_noise(image):
         Denoised image (numpy array).
     """
     mask = (image == 0).astype(np.uint8)  # Create mask where pixels are zero
-    inpainted_image = cv2.inpaint(image, mask, 3, cv2.INPAINT_TELEA)
+    inpainted_image = inpaint(image, mask)
     return inpainted_image
 
 def remove_extract_patch_noise(noisy_image):
@@ -108,7 +115,8 @@ def remove_line_strip_noise(image):
         Denoised image (numpy array).
     """
     mask = (image == 0.5).astype(np.uint8)  # Create mask where strips are added
-    inpainted_image = cv2.inpaint(image, mask, 3, cv2.INPAINT_TELEA)
+    # inpainted_image = cv2.inpaint(image, mask, 3, cv2.INPAINT_TELEA)
+    inpainted_image = inpaint(image, mask, radius=3)
     return inpainted_image
 
 def remove_salt_and_pepper_noise(image):
@@ -121,7 +129,7 @@ def remove_salt_and_pepper_noise(image):
     Returns:
         Denoised image (numpy array).
     """
-    denoised_image = cv2.medianBlur(image, 3)
+    denoised_image = median_blur(image, 3)
     return denoised_image
 
 def remove_gaussian_projection_noise(image):
@@ -134,7 +142,8 @@ def remove_gaussian_projection_noise(image):
     Returns:
         Denoised image (numpy array).
     """
-    denoised_image = cv2.fastNlMeansDenoising(image, None, 30, 7, 21)
+    # denoised_image = cv2.fastNlMeansDenoising(image, None, 30, 7, 21)
+    denoised_image = non_local_means_denoising(image, h=30, patch_size=7, window_size=21)
     return denoised_image
 
  
@@ -172,13 +181,13 @@ def denoise_image(image, method):
 if __name__ == "__main__":
   # save all noise functions in dictionary
   noise_functions = {
-      'block-pixel': add_block_pixel_noise,
-      'convolve': add_convolve_noise,
-      'keep-patch': add_keep_patch_noise,
-      'extract-patch': add_extract_patch_noise,
-      'pad-rotate-project': add_pad_rotate_project_noise,
-      'line-strip': add_line_strip_noise,
-      'salt-and-pepper': add_salt_and_pepper_noise,
+      # 'block-pixel': add_block_pixel_noise,
+      # 'convolve': add_convolve_noise,
+      # 'keep-patch': add_keep_patch_noise,
+      # 'extract-patch': add_extract_patch_noise,
+      # 'pad-rotate-project': add_pad_rotate_project_noise,
+      # 'line-strip': add_line_strip_noise,
+      # 'salt-and-pepper': add_salt_and_pepper_noise,
       'gaussian': add_gaussian_projection_noise
   }
 
