@@ -9,6 +9,10 @@ import numpy as np
 #   Accuracy:  0.4375
 #   Average SSIM:  0.8302919768181796
 #   Average PSNR:  30.89012875967285
+# ADABOOST
+#   Accuracy:  0.4375
+#   Average SSIM:  0.8846801465934537
+#   Average PSNR:  33.4102660312474
 def all_image(image):
   return image.flatten() 
 
@@ -20,6 +24,10 @@ def all_image(image):
 #   Accuracy:  1.0   WOW 😎
 #   Average SSIM:  0.9327131385372782
 #   Average PSNR:  34.47807884234579
+# ADABOOST
+#   Accuracy:  1.0   WOW 😎
+#   Average SSIM:  0.9328037624288227
+#   Average PSNR:  34.509927536840614
 def Hog(image):
   fd, hog_image = hog(image, orientations=8, pixels_per_cell=(16, 16),
                     cells_per_block=(1, 1), visualize=True,feature_vector=True)
@@ -33,6 +41,10 @@ def Hog(image):
 #   Accuracy:  0.9583333333333334
 #   Average SSIM:  0.9328699278993343
 #   Average PSNR:  34.580314125480264
+# ADABOOST
+#   Accuracy:  0.9166666666666666
+#   Average SSIM:  0.93269562814155
+#   Average PSNR:  34.44796350374333
 def Hog2(image):
   fd, hog_image = hog(image, orientations=8, pixels_per_cell=(8, 8),
                     cells_per_block=(1, 1), visualize=True,feature_vector=True)
@@ -46,6 +58,10 @@ def Hog2(image):
 #   Accuracy:  1.0   WOW 😎
 #   Average SSIM:  0.9327725672987425
 #   Average PSNR:  34.489576292298
+# ADABOOST
+#   Accuracy:  0.9791666666666666
+#   Average SSIM:  0.9327849917108947
+#   Average PSNR:  34.534547953087014
 def fourier_transform(image):
   f = np.fft.fft2(image)
   fshift = np.fft.fftshift(f)
@@ -60,6 +76,10 @@ def fourier_transform(image):
 #   Accuracy:  1.0
 #   Average SSIM:  0.9327485700951085
 #   Average PSNR:  34.4827113404983
+# ADABOOST
+#   Accuracy:  1.0  WOW 😎
+#   Average SSIM:  0.9327874380489226
+#   Average PSNR:  34.49591350029939
 def mix_features(image):
   return np.concatenate((Hog(image),fourier_transform(image)),axis=0)
 

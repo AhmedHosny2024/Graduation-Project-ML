@@ -19,7 +19,7 @@ transform2 =  A.Compose(
             )
 
 base_path ='C:/Users/engah/Downloads/GP/Graduation-Project/'
-image_dire='mix_feature_svm/'
+image_dire='mix_feature_adaboost/'
 
 test = pd.read_csv('C:/Users/engah/Downloads/GP/Graduation-Project/datasets/test.csv')
 

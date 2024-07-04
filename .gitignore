@@ -1,13 +1,18 @@
 all_image_svm
 all_image_random_forest
+all_image_adaboost
 Hog_random_forest
 Hog_svm
+Hog_adaboost
 Hog2_random_forest
 Hog2_svm
+Hog2_adaboost
 fourier_transform_random_forest
 fourier_transform_svm
+fourier_transform_adaboost
 mix_feature_random_forest
 mix_feature_svm
+mix_feature_adaboost
 *.pth
 
 # Byte-compiled / optimized / DLL files
