@@ -29,7 +29,7 @@ for idx in range(len(data_info)):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
     # perform selective search
-    _, regions = selectivesearch.selective_search(image, scale=500, sigma=0.9, min_size=100)
+    _, regions = selectivesearch.selective_search(image,min_size=500)
     print("Number of region proposals: ", len(regions))
 
     # Draw rectangles on the image for each proposal
