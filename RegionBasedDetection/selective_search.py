@@ -88,14 +88,6 @@ if __name__ == "__main__":
     # Perform selective search
     segmented_image, regions = selective_search(image, min_size=1000)
     
-    # Visualize the result
-    # fig, ax = plt.subplots(1, figsize=(10, 10))
-    # ax.imshow(segmented_image)
-    # for (x, y, w, h) in regions:
-    #     rect = plt.Rectangle((x, y), w, h, fill=False, edgecolor='red', linewidth=1)
-    #     ax.add_patch(rect)
-    # plt.axis('off')
-    # plt.show()
     for (x, y, w, h) in regions:
         cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
     plt.imshow(image)

@@ -8,13 +8,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 import numpy as np
-from FeatureExtraction.hog import extract_hog_features
+from FeatureExtraction.feature_extraction import extract_features
 from RegionBasedDetection.selective_search import selective_search
-# Function to extract features using HOG
-def extract_features(img):
-    img = np.array(img)
-    features = extract_hog_features(img)
-    return features.flatten()
 
 # Function to calculate Intersection over Union (IoU)
 def calculate_iou(boxA, boxB):
@@ -37,7 +32,7 @@ def detect_objects(image, classifier, regressor):
         x, y, w, h = region
         proposal_img = image[y:y+h, x:x+w]
         proposal_img = cv2.resize(proposal_img, (224, 224))  # Resize to VGG16 input size
-        feature_vector = extract_features(proposal_img)
+        feature_vector = extract_features(proposal_img, 'hog')
         prediction = classifier.predict([feature_vector])
         if prediction == 1:  # Assuming 1 is the positive class
             bbox_reg = regressor.predict([feature_vector])[0]
@@ -65,6 +60,7 @@ for idx in range(len(data_info)):
     img_path = os.path.join(os.getcwd(), img_path.replace("\\", "/"))
     image = cv2.imread(img_path, cv2.IMREAD_UNCHANGED)
     if image is None:
+        print("Image not found")
         continue
     
     original_height, original_width = image.shape[:2]
@@ -84,13 +80,13 @@ for idx in range(len(data_info)):
         x, y, w, h = region
         proposal_img = image[y:y+h, x:x+w]
         proposal_img = cv2.resize(proposal_img, (224, 224))  
-        feature_vector = extract_features(proposal_img)
+        feature_vector = extract_features(proposal_img, 'hog')
         features.append(feature_vector)
         # Determine if the proposal is a positive or negative example
         label = 0  # Default to negative example
         for gt_box in scaled_gt_boxes:
             iou = calculate_iou((x, y, w, h), gt_box)
-            if iou > 0.1:  # Consider a proposal as positive if IoU > 0.1
+            if iou > 0.3:  # Consider a proposal as positive if IoU > 0.1
                 label = 1
                 dx = (gt_box[0] - x) / w
                 dy = (gt_box[1] - y) / h
@@ -106,25 +102,27 @@ for idx in range(len(data_info)):
 features = np.array(features)
 labels = np.array(labels)
 bbox_targets = np.array(bbox_targets)
-
 # Split data into training and testing sets
 X_train, X_test, y_train, y_test, bbox_train, bbox_test = train_test_split(features, labels, bbox_targets, test_size=0.2, random_state=42)
 
 # Initialize and train the SVM classifier
+print("start Training SVM.............")
 svm_classifier = SVC(kernel='linear', class_weight='balanced')
 svm_classifier.fit(X_train, y_train)
-
+print("Start Training Bounding Box Regressor.............")
 # Train the bounding box regressor
 bbox_regressor = LinearRegression()
 bbox_regressor.fit(X_train[y_train == 1], bbox_train[y_train == 1])
-
 # Evaluate the classifier
 y_pred = svm_classifier.predict(X_test)
 print("Accuracy: ", accuracy_score(y_test, y_pred))
-# Save the trained classifier and regressor
+
+print("Saving the trained model.............")
 joblib.dump(svm_classifier, "svm_classifier.pkl")
 joblib.dump(bbox_regressor, "bbox_regressor.pkl")
+
 # Example usage
+print('Testing the model.............')
 image = cv2.imread("datasets/mimic-cxr-jpg/files/p11/p11001469/s54076811/d0d2bd0c-8bc50aa2-a9ab3ca1-cf9c9404-543a10b7.jpg", cv2.IMREAD_UNCHANGED)
 original_height, original_width = image.shape[:2]
 image = cv2.resize(image, (512, 512))
@@ -138,6 +136,14 @@ detected_boxes_label = data_info.iloc[0, 4]
 detected_boxes_label = eval(detected_boxes_label)
 detected_boxes_label = [(int(x * scale_x), int(y * scale_y), int(w * scale_x), int(h * scale_y)) for (x, y, w, h) in detected_boxes_label]
 
+# calculate iou for each detected box
+print("Calculating IOU.............")
+iou = []
+for box in detected_boxes:
+    for label_box in detected_boxes_label:
+        if calculate_iou(box, label_box) > 0.3:
+            iou.append(calculate_iou(box, label_box))
+print("IOU: ", iou)
 # Draw detected boxes on the image
 for (x, y, w, h) in detected_boxes:
     cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
