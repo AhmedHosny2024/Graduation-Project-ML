@@ -45,7 +45,7 @@ def detect_objects(image, classifier, regressor):
     return detected_boxes
 
 # Load the dataset information
-data_info = pd.read_csv("E:/Graduation Project/Graduation-Project-ML/datasets/train.csv", header=None)
+data_info = pd.read_csv("/content/Graduation-Project-ML/datasets/train-10000.csv", header=None)
 data_info = data_info.iloc[1:]  # Assuming your CSV has headers
 
 # Initialize lists to store features and labels
@@ -54,14 +54,16 @@ labels = []
 bbox_targets = []
 
 # Load images and extract region proposals
+count_not_found=0
 for idx in range(len(data_info)):
     print("Processing image {}/{}".format(idx+1, len(data_info)))
     img_path = data_info.iloc[idx, 3]
     img_path = os.path.join(os.getcwd(), img_path.replace("\\", "/"))
     image = cv2.imread(img_path, cv2.IMREAD_UNCHANGED)
     if image is None:
-        print("Image not found")
-        continue
+      count_not_found+=1
+      print("Image not found ", count_not_found)
+      continue
     
     original_height, original_width = image.shape[:2]
     image = cv2.resize(image, (512, 512))
@@ -86,7 +88,7 @@ for idx in range(len(data_info)):
         label = 0  # Default to negative example
         for gt_box in scaled_gt_boxes:
             iou = calculate_iou((x, y, w, h), gt_box)
-            if iou > 0.3:  # Consider a proposal as positive if IoU > 0.1
+            if iou > 0.1:  # Consider a proposal as positive if IoU > 0.1
                 label = 1
                 dx = (gt_box[0] - x) / w
                 dy = (gt_box[1] - y) / h
@@ -123,7 +125,7 @@ joblib.dump(bbox_regressor, "bbox_regressor.pkl")
 
 # Example usage
 print('Testing the model.............')
-image = cv2.imread("datasets/mimic-cxr-jpg/files/p11/p11001469/s54076811/d0d2bd0c-8bc50aa2-a9ab3ca1-cf9c9404-543a10b7.jpg", cv2.IMREAD_UNCHANGED)
+image = cv2.imread("/content/Graduation-Project-ML/datasets/mimic-cxr-jpg/files/p11/p11001469/s54076811/d0d2bd0c-8bc50aa2-a9ab3ca1-cf9c9404-543a10b7.jpg", cv2.IMREAD_UNCHANGED)
 original_height, original_width = image.shape[:2]
 image = cv2.resize(image, (512, 512))
 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -141,7 +143,7 @@ print("Calculating IOU.............")
 iou = []
 for box in detected_boxes:
     for label_box in detected_boxes_label:
-        if calculate_iou(box, label_box) > 0.3:
+        if calculate_iou(box, label_box) > 0.1:
             iou.append(calculate_iou(box, label_box))
 print("IOU: ", iou)
 # Draw detected boxes on the image

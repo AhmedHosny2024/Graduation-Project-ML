@@ -1,1 +1,1 @@
-segmented_image
+from sklearn.metrics.pairwise import euclidean_distances

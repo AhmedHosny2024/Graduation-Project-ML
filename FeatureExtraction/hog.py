@@ -109,3 +109,14 @@ if __name__ == "__main__":
     end= time.time()
     print("Time taken: ",end-start)
     print("HOG feature vector length:", len(hog_features))
+    print(hog_features)
+     # call built-in HOG descriptor
+    # define each block as 4x4 cells of 64x64 pixels each
+    cell_size = (8, 8)      # h x w in pixels
+    block_size = (2, 2)         # h x w in cells
+    nbins = 9  # number of orientation bins 
+    # create a HOG object
+    hog = cv2.HOGDescriptor()
+    h = hog.compute(image)
+    print(h)
+    print(len(h))

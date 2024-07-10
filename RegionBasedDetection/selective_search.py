@@ -86,12 +86,24 @@ if __name__ == "__main__":
     image = cv2.resize(image, (512, 512))
     
     # Perform selective search
-    segmented_image, regions = selective_search(image, min_size=1000)
+    segmented_image_test, regions = selective_search_ss(image, min_size=1000)
     
     for (x, y, w, h) in regions:
         cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+    plt.imshow(segmented_image_test)
+    plt.axis('off')
+    plt.show()
+
     plt.imshow(image)
     plt.axis('off')
     plt.show()
     
     print("Number of regions:", len(regions))
+    import selectivesearch as ss
+    image=cv2.imread("datasets/mimic-cxr-jpg/files/p11/p11001469/s54076811/d0d2bd0c-8bc50aa2-a9ab3ca1-cf9c9404-543a10b7.jpg")
+    segmented_image, regions = ss.selective_search(image, min_size=1000,scale=100, sigma=0.5)
+    print("Number of regions:", len(regions))
+    plt.imshow(segmented_image)
+    plt.axis('off')
+    plt.show()
