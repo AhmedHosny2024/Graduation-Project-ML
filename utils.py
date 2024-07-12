@@ -83,44 +83,6 @@ def apply_convolution(image, kernel):
     
     return convolved_image
 
-# bad implementation of non-local means denoising
-# def non_local_means_denoising(image, h=30, patch_size=7, window_size=21):
-#     """
-#     Apply Non-Local Means Denoising to the image.
-    
-#     Args:
-#         image: Input noisy image (numpy array).
-#         h: Filter strength.
-#         patch_size: Size of the patch.
-#         window_size: Size of the window for searching similar patches.
-        
-#     Returns:
-#         Denoised image (numpy array).
-#     """
-#     pad_size = patch_size // 2
-#     padded_image = np.pad(image, pad_size, mode='reflect')
-#     height, width = image.shape
-#     denoised_image = np.zeros_like(image)
-    
-#     # Precompute Gaussian weights
-#     gaussian_weights = gaussian_kernel(patch_size, patch_size / 6.4)
-    
-#     # Extract patches
-#     patches = view_as_windows(padded_image, (patch_size, patch_size))
-#     patches = patches.reshape(-1, patch_size, patch_size)
-    
-#     # Vectorize patch comparison
-#     for y in range(height):
-#         for x in range(width):
-#             patch = patches[y * width + x]
-#             patch_weights = np.exp(-np.sum((patches - patch) ** 2 * gaussian_weights, axis=(1, 2)) / h ** 2)
-#             patch_weights = patch_weights.reshape(height, width)
-            
-#             # Compute the weighted average of the patches
-#             denoised_image[y, x] = np.sum(patch_weights * image) / np.sum(patch_weights)
-    
-#     return denoised_image
-
 def non_local_means_denoising(image, h=30, patch_size=7, window_size=21):
     
     """

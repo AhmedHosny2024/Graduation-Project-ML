@@ -84,11 +84,11 @@ def mix_features(image):
   return np.concatenate((Hog(image),fourier_transform(image)),axis=0)
 
 '''
-when the model classifiy the image noise type wrong the denoised image will be wrong (as the denoising function will be wrong as well) 
-we got high SSIM and PSNR because the change in the image is block pixel noise
-BUT it remove the medical information in the image or didn't remove the noise which is the main goal of the project
+Comments:
+- when the model classify the image noise type wrong the denoised image will be wrong (as the denoising function will be wrong as well) 
+- we got high SSIM and PSNR because the change in the image is block pixel noise BUT it remove the medical information in the image or didn't remove the noise which is the main goal of the project
 so we didn't use it
-it get this result which train on 4 types of noise 450 image and test on 48 image so the classifier get high accuracy but the medical information is lost as i save the denoised image and the noised image and the original image
+- it get this result with training on 4 types of noise 450 image and test on 48 image so the classifier get high accuracy but the medical information is lost as i save the denoised image and the noised image and the original image
 if we have more than one type of noise in the image the denoier function of one type of noise may affect the other type of noise (generate more noise in the image)
 so we didn't use it and use end to end model 
 '''

@@ -2,7 +2,6 @@ import pandas as pd
 import cv2
 import numpy as np
 import joblib
-import sys
 import albumentations as A
 from generate_noise import *
 from feature_extraction import *

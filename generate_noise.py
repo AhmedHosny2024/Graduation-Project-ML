@@ -49,8 +49,6 @@ def add_convolve_noise(image, sigma=1.0, mean=0, sigma_noise=18):
     
     return noisy_image,image
 
-
-# TODO: they are the same 
 # Keep-Patch: where pixels outside of a randomly chosen k × k patch are set to zero
 def add_keep_patch_noise(image, height_patch_size=510,width_patch_size=510):
     """

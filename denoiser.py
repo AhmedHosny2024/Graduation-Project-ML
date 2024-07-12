@@ -38,9 +38,6 @@ def remove_convolve_noise(image, sigma=1.0):
 
     return denoised_image
 
-
-
-
 def remove_keep_patch_noise(image):
     """
     Remove Keep-Patch noise using image inpainting.
@@ -146,7 +143,6 @@ def remove_gaussian_projection_noise(image):
     denoised_image = non_local_means_denoising(image, h=30, patch_size=7, window_size=21)
     return denoised_image
 
- 
 def denoise_image(image, method):
     if method == 'block-pixel':
         # very good solution
@@ -181,13 +177,13 @@ def denoise_image(image, method):
 if __name__ == "__main__":
   # save all noise functions in dictionary
   noise_functions = {
-      # 'block-pixel': add_block_pixel_noise,
-      # 'convolve': add_convolve_noise,
-      # 'keep-patch': add_keep_patch_noise,
-      # 'extract-patch': add_extract_patch_noise,
-      # 'pad-rotate-project': add_pad_rotate_project_noise,
-      # 'line-strip': add_line_strip_noise,
-      # 'salt-and-pepper': add_salt_and_pepper_noise,
+      'block-pixel': add_block_pixel_noise,
+      'convolve': add_convolve_noise,
+      'keep-patch': add_keep_patch_noise,
+      'extract-patch': add_extract_patch_noise,
+      'pad-rotate-project': add_pad_rotate_project_noise,
+      'line-strip': add_line_strip_noise,
+      'salt-and-pepper': add_salt_and_pepper_noise,
       'gaussian': add_gaussian_projection_noise
   }
 
