@@ -3,6 +3,16 @@ import cv2
 import matplotlib.pyplot as plt
 import time
 def apply_kernel(image, kernel):
+    """
+    Applies a kernel to an image using convolution.
+    
+    Parameters:
+    - image (numpy.ndarray): Input image.
+    - kernel (numpy.ndarray): Convolution kernel.
+    
+    Returns:
+    - numpy.ndarray: Convolved image.
+    """
     k_height, k_width = kernel.shape
     img_height, img_width = image.shape
     pad_height, pad_width = k_height // 2, k_width // 2
@@ -22,6 +32,16 @@ def apply_kernel(image, kernel):
     return output
 
 def sobel_operator(image):
+    """
+    Applies Sobel operator to an image to compute gradients in x and y directions.
+    
+    Parameters:
+    - image (numpy.ndarray): Input image.
+    
+    Returns:
+    - gx (numpy.ndarray): Gradient in x direction.
+    - gy (numpy.ndarray): Gradient in y direction.
+    """
     # Sobel kernels
     sobel_x = np.array([[-1, 0, 1],
                         [-2, 0, 2],
@@ -38,6 +58,16 @@ def sobel_operator(image):
     return gx, gy
 
 def compute_gradients(image):
+    """
+    Computes magnitude and orientation of gradients using Sobel operator.
+    
+    Parameters:
+    - image (numpy.ndarray): Input image.
+    
+    Returns:
+    - magnitude (numpy.ndarray): Magnitude of gradients.
+    - angle (numpy.ndarray): Orientation of gradients (in degrees).
+    """
     # Convert image to grayscale
     if len(image.shape) == 3:
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -53,6 +83,18 @@ def compute_gradients(image):
     return magnitude, angle
 
 def calculate_histogram(magnitude, angle, cell_size=(8, 8), bins=9):
+    """
+    Calculates histograms of gradient orientations for cells in the image.
+    
+    Parameters:
+    - magnitude (numpy.ndarray): Magnitude of gradients.
+    - angle (numpy.ndarray): Orientation of gradients (in degrees).
+    - cell_size (tuple): Size of each cell (height, width).
+    - bins (int): Number of bins in the histogram.
+    
+    Returns:
+    - histogram (numpy.ndarray): Histogram of gradients for each cell.
+    """
     cell_rows, cell_cols = cell_size
     angle_bins = np.linspace(0, 180, bins+1)
     
@@ -74,6 +116,16 @@ def calculate_histogram(magnitude, angle, cell_size=(8, 8), bins=9):
     return histogram
 
 def normalize_histogram(histogram, block_size=(2, 2)):
+    """
+    Normalizes histograms within each block.
+    
+    Parameters:
+    - histogram (numpy.ndarray): Histogram of gradients for each cell.
+    - block_size (tuple): Size of each block (num_cells_y, num_cells_x).
+    
+    Returns:
+    - normalized_histogram (numpy.ndarray): Normalized histogram.
+    """
     num_blocks_y = histogram.shape[0] - block_size[0] + 1
     num_blocks_x = histogram.shape[1] - block_size[1] + 1
     if num_blocks_y <= 0 or num_blocks_x <= 0:
@@ -90,6 +142,18 @@ def normalize_histogram(histogram, block_size=(2, 2)):
     return normalized_histogram.ravel()
 
 def extract_hog_features(image, cell_size=(8, 8), block_size=(2, 2), bins=9):
+    """
+    Extracts Histogram of Oriented Gradients (HOG) features from an image.
+    
+    Parameters:
+    - image (numpy.ndarray): Input image.
+    - cell_size (tuple): Size of each cell (height, width).
+    - block_size (tuple): Size of each block (num_cells_y, num_cells_x).
+    - bins (int): Number of bins in the histogram.
+    
+    Returns:
+    - hog_features (numpy.ndarray): HOG feature vector.
+    """
     magnitude, angle = compute_gradients(image)
     histogram = calculate_histogram(magnitude, angle, cell_size, bins)
     hog_features = normalize_histogram(histogram, block_size)

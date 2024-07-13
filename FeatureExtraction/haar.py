@@ -2,9 +2,35 @@ import numpy as np
 import cv2
 
 def compute_integral_image(image):
+    """
+    Computes the integral image for a given input image.
+    
+    Parameters:
+    - image (numpy.ndarray): Input image for which the integral image is to be computed.
+    
+    Returns:
+    - numpy.ndarray: Integral image.
+    """
     return np.cumsum(np.cumsum(image, axis=0), axis=1)
 
 def compute_haar_feature(integral_image, feature_type, position, size):
+    """
+    Computes a specified Haar-like feature for a given region in the integral image.
+    
+    Parameters:
+    - integral_image (numpy.ndarray): The integral image.
+    - feature_type (str): The type of Haar feature to compute. Options are:
+        - 'two-rectangle'
+        - 'three-rectangle'
+        - 'four-rectangle'
+        - 'edge-horizontal'
+        - 'edge-vertical'
+    - position (tuple): The top-left corner (x, y) of the region.
+    - size (tuple): The size (width, height) of the region.
+    
+    Returns:
+    - float: The computed Haar feature value.
+    """
     x, y = position
     w, h = size
     
@@ -46,6 +72,16 @@ def compute_haar_feature(integral_image, feature_type, position, size):
     return 0
 
 def extract_haar_features(image, window_size=(24, 24)):
+    """
+    Extracts Haar features from an image using a sliding window approach.
+    
+    Parameters:
+    - image (numpy.ndarray): Input image from which to extract Haar features.
+    - window_size (tuple): Size (width, height) of the sliding window.
+    
+    Returns:
+    - list: List of extracted Haar feature values.
+    """
     integral_image = compute_integral_image(image)
     integral_image = integral_image / (integral_image.max() - integral_image.min())  # Normalize integral image
     feature_types = ['two-rectangle', 'three-rectangle', 'four-rectangle', 'edge-horizontal', 'edge-vertical']
@@ -61,6 +97,16 @@ def extract_haar_features(image, window_size=(24, 24)):
     return features
 
 def extract_haar_features_3d(image, window_size=(24, 24)):
+    """
+    Extracts Haar features from a 3D image (multi-channel) using a sliding window approach.
+    
+    Parameters:
+    - image (numpy.ndarray): Input 3D image (multi-channel) from which to extract Haar features.
+    - window_size (tuple): Size (width, height) of the sliding window.
+    
+    Returns:
+    - list: List of extracted Haar feature values.
+    """
     features = []
     for channel in range(image.shape[2]):
         channel_features = extract_haar_features(image[:, :, channel], window_size)
@@ -75,6 +121,7 @@ if __name__ == "__main__":
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     image = np.array(image)  # Example 3D image with 3 slices (RGB channels)
     print(image.shape)
+    
     # Extract Haar features
     haar_features = extract_haar_features_3d(image, window_size=(24, 24))
     print(len(haar_features))

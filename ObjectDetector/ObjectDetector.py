@@ -2,11 +2,6 @@ import joblib
 import cv2
 import matplotlib.pyplot as plt
 import pandas as pd
-import os
-from sklearn.svm import SVC
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split
 import numpy as np
 from FeatureExtraction.feature_extraction import extract_features
 from RegionBasedDetection.selective_search import selective_search
@@ -26,7 +21,7 @@ def calculate_iou(boxA, boxB):
 
 # Function to detect objects in an image using the trained classifier and regressor
 def detect_objects(image, classifier, regressor):
-    _, regions = selective_search(image, min_size=1000)
+    _, regions = selective_search(image)
     detected_boxes = []
     print("len(regions): ", len(regions))
     for region in regions:
@@ -34,6 +29,8 @@ def detect_objects(image, classifier, regressor):
         proposal_img = image[y:y+h, x:x+w]
         proposal_img = cv2.resize(proposal_img, (224, 224))  # Resize to VGG16 input size
         feature_vector = extract_features(proposal_img, 'hog')
+        #concatenate the feature vector to be size 26244
+        feature_vector = np.concatenate((feature_vector, np.zeros(26244 - len(feature_vector))))
         prediction = classifier.predict([feature_vector])
         if prediction == 1:  # Assuming 1 is the positive class
             bbox_reg = regressor.predict([feature_vector])[0]
@@ -74,18 +71,19 @@ detected_boxes_label = [(int(x * scale_x), int(y * scale_y), int(w * scale_x), i
 print("Calculating IOU.............")
 iou = []
 for box in detected_boxes:
+    iou_best = 0
     for label_box in detected_boxes_label:
-        if calculate_iou(box, label_box) > 0.4:
-            iou.append(calculate_iou(box, label_box))
-            break
+        iou_box=calculate_iou(box, label_box)
+        if iou_box > 0.4:
+            if iou_box > iou_best:
+                iou_best = iou_box
+    iou.append(iou_best)
 print("IOU: ", iou)
 # Draw detected boxes on the image
 print("len(detected_boxes): ", len(detected_boxes))
 print("len(detected_boxes_label): ", len(detected_boxes_label))
 for (x, y, w, h) in detected_boxes:
     cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-# for (x, y, w, h) in detected_boxes_label:
-#     cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
 plt.imshow(image)
 plt.axis('off')
 plt.show()

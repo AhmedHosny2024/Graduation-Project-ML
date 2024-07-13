@@ -2,15 +2,36 @@ import numpy as np
 import cv2
 from skimage.segmentation import felzenszwalb
 from skimage.feature import local_binary_pattern
-from skimage.color import rgb2lab, rgb2gray
+from skimage.color import rgb2gray
 from skimage.measure import regionprops
 import matplotlib.pyplot as plt
-from sklearn.metrics.pairwise import euclidean_distances
 
 def segment_image(image, scale=100, sigma=0.5, min_size=50):
+    """
+    Segment an input image into regions using Felzenszwalb's method.
+    
+    Parameters:
+    - image (numpy.ndarray): Input RGB image.
+    - scale (int): Parameter controlling the segment size.
+    - sigma (float): Width of Gaussian kernel for preprocessing.
+    - min_size (int): Minimum component size for pruning.
+    
+    Returns:
+    - numpy.ndarray: Segmented image with labeled regions.
+    """
     return felzenszwalb(image, scale=scale, sigma=sigma, min_size=min_size)
 
 def extract_region_features(region, image):
+    """
+    Extracts features from a given region within the original image.
+    
+    Parameters:
+    - region (skimage.measure._regionprops.RegionProperties): Properties of the region to extract features from.
+    - image (numpy.ndarray): Original RGB image.
+    
+    Returns:
+    - numpy.ndarray: Feature vector including color histogram, texture histogram, size, and fill ratio of the region.
+    """
     minr, minc, maxr, maxc = region.bbox
     region_image = image[minr:maxr, minc:maxc]
     
@@ -27,56 +48,93 @@ def extract_region_features(region, image):
     return np.concatenate([color_hist, texture_hist, [size, fill]])
 
 def compute_similarity(region1, region2):
+    """
+    Computes a similarity score between two regions based on their feature vectors.
+    
+    Parameters:
+    - region1 (numpy.ndarray): Feature vector of region 1.
+    - region2 (numpy.ndarray): Feature vector of region 2.
+    
+    Returns:
+    - float: Similarity score between the two regions.
+    """
     return np.sum(np.abs(region1 - region2))
 
 def merge_regions(region1, region2):
+    """
+    Merges two regions by averaging their feature vectors.
+    
+    Parameters:
+    - region1 (numpy.ndarray): Feature vector of region 1.
+    - region2 (numpy.ndarray): Feature vector of region 2.
+    
+    Returns:
+    - numpy.ndarray: Merged feature vector of the two regions.
+    """
     return (region1 + region2) / 2
 
-def selective_search(image, scale=100, sigma=0.5, min_size=50):
+def selective_search(image, scale=100, sigma=0.5, min_size=50, num_iterations=100):
+    """
+    Performs selective search on an input image to generate region proposals.
+    
+    Parameters:
+    - image (numpy.ndarray): Input RGB image.
+    - scale (int): Parameter controlling the segment size in Felzenszwalb's segmentation.
+    - sigma (float): Width of Gaussian kernel for preprocessing in Felzenszwalb's segmentation.
+    - min_size (int): Minimum component size for pruning in Felzenszwalb's segmentation.
+    - num_iterations (int): Number of iterations for greedy region merging.
+    
+    Returns:
+    - numpy.ndarray: Segmented image with labeled regions.
+    - list: List of bounding boxes for the merged regions.
+    """
+    # Step 1: Segment the image into regions
     segmented_image = segment_image(image, scale=scale, sigma=sigma, min_size=min_size)
     regions = regionprops(segmented_image)
     
+    # Step 2: Extract features for each region
     region_features = []
+    region_bboxes = []
     for region in regions:
         features = extract_region_features(region, image)
         region_features.append(features)
+        minr, minc, maxr, maxc = region.bbox
+        region_bboxes.append([minc, minr, maxc, maxr])
     
-    region_pairs = [(i, j) for i in range(len(region_features)) for j in range(i+1, len(region_features))]
-    
-    similarities = {}
-    for (i, j) in region_pairs:
-        similarity = compute_similarity(region_features[i], region_features[j])
-        similarities[(i, j)] = similarity
-    
-    while len(similarities) > 0:
+    # Step 3: Perform greedy region merging for num_iterations
+    for iteration in range(num_iterations):
+        # Step 4: Calculate pairwise similarities between all regions
+        region_pairs = [(i, j) for i in range(len(region_features)) for j in range(i+1, len(region_features))]
+        similarities = {}
+        for (i, j) in region_pairs:
+            similarity = compute_similarity(region_features[i], region_features[j])
+            similarities[(i, j)] = similarity
+        
+        # Step 5: Find the most similar pair of regions
         i, j = min(similarities, key=similarities.get)
         
-        if j >= len(region_features):
-            similarities.pop((i, j))
-            continue
+        # Step 6: Merge the two regions into a single larger region
+        merged_features = merge_regions(region_features[i], region_features[j])
         
-        region_features[i] = merge_regions(region_features[i], region_features[j])
+        # Step 7: Update the region features and remove the original regions
+        region_features[i] = merged_features
         region_features.pop(j)
         
-        # Remove outdated similarities
-        similarities = {(a, b): sim for (a, b), sim in similarities.items() if b != j and a != j}
-        
-        # Update similarities for the merged region
-        new_similarities = {}
-        for k in range(len(region_features)):
-            if k != i:
-                similarity = compute_similarity(region_features[i], region_features[k])
-                new_similarities[(min(i, k), max(i, k))] = similarity
-        
-        similarities.update(new_similarities)
+        # Step 8: Update the bounding boxes of the merged regions
+        minc = min(region_bboxes[i][0], region_bboxes[j][0])
+        minr = min(region_bboxes[i][1], region_bboxes[j][1])
+        maxc = max(region_bboxes[i][2], region_bboxes[j][2])
+        maxr = max(region_bboxes[i][3], region_bboxes[j][3])
+        region_bboxes[i] = [minc, minr, maxc, maxr]
+        region_bboxes.pop(j)
     
-    # Collect bounding boxes of the regions
-    regions_bboxes = []
-    for region in regions:
-        minr, minc, maxr, maxc = region.bbox
-        regions_bboxes.append((minc, minr, maxc - minc, maxr - minr))
+    # Step 9: Collect final bounding boxes of the merged regions
+    final_bboxes = []
+    for bbox in region_bboxes:
+        minc, minr, maxc, maxr = bbox
+        final_bboxes.append((minc, minr, maxc - minc, maxr - minr))
     
-    return segmented_image, regions_bboxes
+    return segmented_image, final_bboxes
 
 if __name__ == "__main__":
     # Load the image
@@ -86,8 +144,9 @@ if __name__ == "__main__":
     image = cv2.resize(image, (512, 512))
     
     # Perform selective search
-    segmented_image_test, regions = selective_search_ss(image, min_size=1000)
+    segmented_image_test, regions = selective_search(image)
     
+    # Display results
     for (x, y, w, h) in regions:
         cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
@@ -100,10 +159,3 @@ if __name__ == "__main__":
     plt.show()
     
     print("Number of regions:", len(regions))
-    import selectivesearch as ss
-    image=cv2.imread("datasets/mimic-cxr-jpg/files/p11/p11001469/s54076811/d0d2bd0c-8bc50aa2-a9ab3ca1-cf9c9404-543a10b7.jpg")
-    segmented_image, regions = ss.selective_search(image, min_size=1000,scale=100, sigma=0.5)
-    print("Number of regions:", len(regions))
-    plt.imshow(segmented_image)
-    plt.axis('off')
-    plt.show()
