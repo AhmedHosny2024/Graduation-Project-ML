@@ -8,6 +8,7 @@ from generate_noise import *
 from feature_extraction import *
 from sklearn.ensemble import RandomForestClassifier
 
+from random_forest_model import RandomForest
 
 transform =  A.Compose(
                 [
@@ -38,7 +39,7 @@ for img_path in tain_img_paths:
     # resize the image to 512x512
     img = transform(image=img)["image"]
     noise_type = np.random.choice([1,2,3])
-    for i in range(1,4,1):
+    for i in range(1,5,1):
       choice=i
       if noise_type == 1:
           noisy_img,_ = add_block_pixel_noise(img)
@@ -63,15 +64,17 @@ for img_path in tain_img_paths:
 
 # 3 train the model RandomForest
 
-model = RandomForestClassifier(n_estimators=100, random_state=42)
+# model = RandomForestClassifier(n_estimators=100, random_state=42)
+model = RandomForest(n_trees=75, max_depth=100, min_samples_split=2, n_feature=None)
 
+Xtrain = np.array(Xtrain)
+ytrain = np.array(ytrain)
 print("Training the model...")
-print("Xtrain shape: ", np.array(Xtrain).shape)
-print("ytrain shape: ", np.array(ytrain).shape)
+print("Xtrain shape: ", Xtrain.shape)
+print("ytrain shape: ", ytrain.shape)
 
 model.fit(Xtrain, ytrain)
 
-# 4 test the model
 # 4 test the model
 test_img_paths = test["mimic_image_file_path"].tolist()
 Xtest=[]
@@ -82,7 +85,7 @@ for img_path in test_img_paths:
     img = cv2.imread(img_path,cv2.IMREAD_UNCHANGED)
     img = transform(image=img)["image"]
     choice = np.random.choice([1,2,3])  
-    for i in range(1,4,1):
+    for i in range(1,5,1):
       choice = i      
       if choice == 1:
           noisy_img,_ = add_block_pixel_noise(img)
@@ -98,17 +101,21 @@ for img_path in test_img_paths:
           label ="no-noise"
       noisy_img = transform2(image=noisy_img)["image"]
       # Xtest.append(all_image(noisy_img))
-      # Xtest.append(Hog(noisy_img))
+      Xtest.append(Hog(noisy_img))
       # Xtest.append(Hog2(noisy_img))
       # Xtest.append(fourier_transform(noisy_img))
-      Xtest.append(mix_features(noisy_img))
+      # Xtest.append(mix_features(noisy_img))
       ytest.append(label)
 
+Xtest = np.array(Xtest)
+ytest = np.array(ytest)
 print("Testing the model...")
-print("Xtest shape: ", np.array(Xtest).shape)
-print("ytest shape: ", np.array(ytest).shape)
+print("Xtest shape: ", Xtest.shape)
+print("ytest shape: ", ytest.shape)
 y_pred = model.predict(Xtest)
 # calculate the accuracy
+print("y_pred: ", y_pred)
+print("ytest: ", ytest)
 accuracy = np.sum(y_pred == ytest) / len(ytest)
 print("Accuracy: ", accuracy)
 
