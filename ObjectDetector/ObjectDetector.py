@@ -44,7 +44,7 @@ def detect_objects(image, classifier, regressor):
 
 # Load the dataset information
 
-data_info = pd.read_csv("E:/Graduation Project/Graduation-Project-ML/datasets/train.csv", header=None)
+data_info = pd.read_csv("/datasets/train.csv", header=None)
 data_info = data_info.iloc[1:]  # Assuming your CSV has headers
 
 
@@ -54,7 +54,7 @@ bbox_regressor = joblib.load("bbox_regressor.pkl")
 
 # Example usage
 print('Testing the model.............')
-image = cv2.imread("E:/Graduation Project/Graduation-Project-ML/datasets/mimic-cxr-jpg/files/p11/p11002268/s58301648/a57c42a3-a519a3eb-50a43237-c6d2eacb-fbae58b3.jpg", cv2.IMREAD_UNCHANGED)
+image = cv2.imread("/datasets/mimic-cxr-jpg/files/p11/p11002268/s57561051/4a62e451-665fb8d2-9d037176-e88bb926-9b6beed0.jpg", cv2.IMREAD_UNCHANGED)
 original_height, original_width = image.shape[:2]
 image = cv2.resize(image, (512, 512))
 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)

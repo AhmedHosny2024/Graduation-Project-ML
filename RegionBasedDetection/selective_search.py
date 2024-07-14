@@ -139,6 +139,7 @@ def selective_search(image, scale=100, sigma=0.5, min_size=50, num_iterations=10
 if __name__ == "__main__":
     # Load the image
     image_path = "datasets/mimic-cxr-jpg/files/p11/p11001469/s54076811/d0d2bd0c-8bc50aa2-a9ab3ca1-cf9c9404-543a10b7.jpg"
+    # image_path = "E:/Graduation Project/Graduation-Project-ML/datasets/mimic-cxr-jpg/files/p11/p11002268/s58301648/a57c42a3-a519a3eb-50a43237-c6d2eacb-fbae58b3.jpg"
     image = cv2.imread(image_path)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     image = cv2.resize(image, (512, 512))
@@ -149,10 +150,6 @@ if __name__ == "__main__":
     # Display results
     for (x, y, w, h) in regions:
         cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-    plt.imshow(segmented_image_test)
-    plt.axis('off')
-    plt.show()
 
     plt.imshow(image)
     plt.axis('off')
