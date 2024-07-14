@@ -87,4 +87,4 @@ for (x, y, w, h) in detected_boxes:
 plt.imshow(image)
 plt.axis('off')
 plt.show()
-# python -m ObjectDetector.ObjectDetector
+# python -m ObjectDetector.object_detector
