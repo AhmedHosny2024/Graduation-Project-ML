@@ -77,7 +77,6 @@ for idx in range(len(data_info)):
     scale_x = 512 / original_width
     scale_y = 512 / original_height
     scaled_gt_boxes = [(int(x * scale_x), int(y * scale_y), int(w * scale_x), int(h * scale_y)) for (x, y, w, h) in ground_truth_boxes]
-    
     for region in regions:
         x, y, w, h = region
         proposal_img = image[y:y+h, x:x+w]
@@ -87,17 +86,19 @@ for idx in range(len(data_info)):
         # Determine if the proposal is a positive or negative example
         label = 0  # Default to negative example
         for gt_box in scaled_gt_boxes:
+            best_box = (0, 0, 0, 0)
+            best_box_label = (0, 0, 0, 0)
+            best_iou = 0
+            iou_current = calculate_iou((x, y, w, h), gt_box)
             iou = calculate_iou((x, y, w, h), gt_box)
-            if iou > 0.1:  # Consider a proposal as positive if IoU > 0.1
+            if iou_current > 0.4:  # Consider a proposal as positive if IoU > 0.1
+                best_iou = iou_current
+                best_box = (x, y, w, h)
+                best_box_label = gt_box
+            if best_iou!=0:
                 label = 1
-                dx = (gt_box[0] - x) / w
-                dy = (gt_box[1] - y) / h
-                dw = np.log(gt_box[2] / w)
-                dh = np.log(gt_box[3] / h)
-                bbox_targets.append((dx, dy, dw, dh))
-                break
-        if label == 0:
-            bbox_targets.append((0, 0, 0, 0))
+        bbox_targets.append((best_box_label[0] - best_box[0], best_box_label[1] - best_box[1],
+                                     np.log(best_box_label[2] / best_box[2]), np.log(best_box_label[3] / best_box[3])))
         labels.append(label)
 
 # Convert to numpy arrays
@@ -143,8 +144,15 @@ print("Calculating IOU.............")
 iou = []
 for box in detected_boxes:
     for label_box in detected_boxes_label:
-        if calculate_iou(box, label_box) > 0.1:
-            iou.append(calculate_iou(box, label_box))
+        best_box = (0, 0, 0, 0)
+        best_box_label = (0, 0, 0, 0)
+        best_iou = 0
+        iou_current = calculate_iou(box, label_box)
+        if iou_current > best_iou:
+                best_iou = iou_current
+                best_box = box
+                best_box_label = label_box
+        iou.append(calculate_iou(box, label_box))
 print("IOU: ", iou)
 # Draw detected boxes on the image
 for (x, y, w, h) in detected_boxes:
