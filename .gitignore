@@ -163,3 +163,18 @@ svm_classifier.pkl
 *.pkl
 Screenshot 2024-07-09 163615.png
 Screenshot 2024-07-09 163756.png
+/all_image_adaboost
+/all_image_random_forest
+/all_image_svm
+/fourier_transform_adaboost
+/fourier_transform_random_forest
+/fourier_transform_svm
+/Hog2_adaboost
+/Hog2_random_forest
+/Hog2_svm
+/Hog_adaboost
+/Hog_random_forest
+/Hog_svm
+/mix_feature_adaboost
+/mix_feature_random_forest
+/mix_feature_svm
