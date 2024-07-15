@@ -37,7 +37,7 @@ for img_path in tain_img_paths:
     # resize the image to 512x512
     img = transform(image=img)["image"]
     noise_type = np.random.choice([1,2,3])
-    for i in range(1,4,1):
+    for i in range(1,5,1):
       choice=i
       if noise_type == 1:
           noisy_img,_ = add_block_pixel_noise(img)
@@ -78,7 +78,7 @@ for img_path in test_img_paths:
     img = cv2.imread(img_path,cv2.IMREAD_UNCHANGED)
     img = transform(image=img)["image"]
     choice = np.random.choice([1,2,3])   
-    for i in range(1,4,1):
+    for i in range(1,5,1):
       choice=i     
       if choice == 1:
           noisy_img,_ = add_block_pixel_noise(img)
